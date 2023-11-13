@@ -11,31 +11,26 @@ Cohort: evSD3
 
 """
 import pandas as pd
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+
+
+movieFile = pd.read_csv('movies.csv')
+mainGenreFile = pd.read_table('main-genre.txt')
 
 
 def task1():
     # read the files normally
-    movieFile = pd.read_csv('movies.csv')
-    mainGenreFile = pd.read_table('main-genre.txt')
-
-    # print the columns to identify the common column
-    # print("Columns in movies_df:", movieFile.columns)
-    # print("Columns in main_genre_df:", mainGenreFile.columns)
-
-    # print("Head of main_genre_df:\n", mainGenreFile.head())
-    # print("First few rows of movies:")
-    # print(movieFile.head())
-
-    # print("\nFirst few rows of main_genre:")
-    # print(mainGenreFile.head())
-
-    # common_columns = set(movieFile.columns) & set(mainGenreFile.columns)
-    # print("Potential common columns:", common_columns)
-
+    # movieFile = pd.read_csv('movies.csv')
+    # mainGenreFile = pd.read_table('main-genre.txt')
     # identifying the actual name of the column that is common between the two DataFrames
-    #print("Columns in movies:", movieFile.columns)
-    #print("Columns in main_genre:", mainGenreFile.columns)
+    # print the columns to identify the common column
+    # print(movieFile.columns)
+    # print(mainGenreFile.columns)
+    # print(mainGenreFile.head())
+    # print(movieFile.head())
+    # print(mainGenreFile.head())
+    #print(movieFile.columns)
+    #print(mainGenreFile.columns)
 
    # merge the files using pd from pandas in a variable
     # inner: inner merge returns only the rows that have matching values in both DataFrames. Rows with non-matching values are excluded from the result.
@@ -54,60 +49,102 @@ def task1():
     print("Most popular: ", mostPopularGenre)
     print("Least popular: ", leastPopularGenre)
 
-    # top_genres = mergingFiles['main_genre'].value_counts().nlargest(8)
+    # Now we use matplotlib to generate the datas
+    # mergingFiles['main_Genre'].value_counts(): This part counts the occurrences of each unique value in the 'main_Genre' column. nlargest(8): This method selects the 8 largest counts. So, topGenres contains the top 8 genres and their respective counts.
+    topGenres = mergingFiles['main_Genre'].value_counts().nlargest(8)
+    # this one creates a figure 10 x 6
+    plt.figure(figsize=(10, 6))
+    #(x,y) sizes with the layout
+    plt.bar(topGenres.index, topGenres.values, color='green')
+    # print up the information
+    plt.title('Top 8 Popular Genres')
+    plt.xlabel('Main Genre')
+    plt.ylabel('Number of Movies')
+    #read it better
+    plt.xticks(rotation=45)
+    plt.show()
+
+#task1()
+
+
+
+def task2():
+
+    #print(movieFile['Genre'].unique())
+    #print(movieFile['Genre'].dtype)
+    # Merge the files using 'genre' column
+    mostCommonGenre = movieFile['Genre'].value_counts().idxmax()
+    leastCommonGenre = movieFile['Genre'].value_counts().idxmin()
+
+    # Print the results
+    print("Most common genre:", mostCommonGenre)
+    print("Least common genre:", leastCommonGenre)
+
+    # Print out the results
+    print("Most common genre: ", mostCommonGenre)
+    print("Least common genre: ", leastCommonGenre)
+
+    topGenres = movieFile['Genre'].value_counts().nlargest(16)
+    plt.figure(figsize=(10, 6))
+    plt.bar(topGenres.index, topGenres.values, color='red')
+    plt.title('Top 15 Genre Distribution')
+    plt.xlabel('Genre')
+    plt.ylabel('Number of Movies')
+    plt.xticks(rotation=45)
+    plt.show()
+
+
+# Call the function to execute the task
+#task2()
+    
+    
+    
+    
+#def task3():
+    # Read the movies data
+    # movieFile = pd.read_csv('movies.csv')
+
+    # # Convert 'Runtime' column to numeric, handling non-numeric values
+    # movieFile['Runtime'] = pd.to_numeric(movieFile['Runtime'], errors='coerce')
+
+    # # Display box plot to visualize outliers in Runtime
     # plt.figure(figsize=(10, 6))
-    # plt.bar(top_genres.index, top_genres.values, color='skyblue')
-    # plt.title('Top 8 Popular Genres')
-    # plt.xlabel('Main Genre')
-    # plt.ylabel('Number of Movies')
-    # plt.xticks(rotation=45)
+    # plt.boxplot(movieFile['Runtime'].dropna(), vert=False)  # Drop NaN values for the boxplot
+    # plt.title('Boxplot of Movie Runtimes')
+    # plt.xlabel('Runtime (minutes)')
     # plt.show()
 
-task1()
+    # # Identify outliers based on the box plot
+    # runtime_outliers = movieFile[movieFile['Runtime'] > movieFile['Runtime'].quantile(0.75) + 1.5 * (movieFile['Runtime'].quantile(0.75) - movieFile['Runtime'].quantile(0.25))]
 
+    # # Print the titles of the movies considered as outliers
+    # print("Movies with Outlier Runtimes:")
+    # print(runtime_outliers[['Title', 'Runtime']])
+#task3()  
+    
+    
+    
+def task4():
 
+    numberOfVotes = movieFile['Number of Votes'].isnull().sum()
+    rating = movieFile['Rating'].isnull().sum()
 
-# def task2():
-    
-#     """
-#     What is the most and least common genre? Note that there are two
-#     columns related to genres: ’genre’ and ’main genre.’ For this task, the
-#     ’genre’ attribute is the focus, not ’main genre. How the results should
-#     be displayed? Only print the most and the least common genres and
-#     nothing else
-#     """
-    
-    
-    
-    
-# def task3():
-    
-#     """
-#     Apply an appropriate visualization technique to display the outliers in
-#     movie duration (Runtime). Print the names of the movies for which the
-#     duration is considered an outlier. How the results should be dis-
-#     played? Only print the title of the movies that belong to the outliers.
-#     Also display the visualization - no need to save the visualization in any
-#     file.
-#     """
-    
-    
-    
-    
-    
-# def task4():
-    
-#     """
-#     Apply an appropriate visualization technique to analyze the relationship
-#     between the ’number of votes’ and the ’rating’. Report if there are any
-#     null values in either of the mentioned attributes. If any null values are
-#     found, they should be filled with the average of the existing values for each
-#     attribute prior to the visualization. Note the difference scale of the two
-#     attributes, ’number of votes’ and the ’rating’. How the results should
-#     be displayed? Write a short comment below this task’s function and
-#     explain the the existence of null values in those attributes/columns. Also
-#     display the figure. No need to save the visualization in any file.
-#     """
+    print(f"Number of null values in 'Number of Votes': {numberOfVotes}")
+    print(f"Number of null values in 'Rating': {rating}")
+
+    # Fill null values with the average for each attribute
+    movieFile['Number of Votes'].fillna(movieFile['Number of Votes'].mean(), inplace=True)
+    movieFile['Rating'].fillna(movieFile['Rating'].mean(), inplace=True)
+
+    # Visualize the relationship between 'number of votes' and 'rating'
+    plt.figure(figsize=(10, 6))
+    plt.scatter(movieFile['Number of Votes'], movieFile['Rating'], alpha=0.5)
+    plt.title('Relationship between Number of Votes and Rating')
+    plt.xlabel('Number of Votes')
+    plt.ylabel('Rating')
+    plt.show()
+
+task4()
     
     
     
