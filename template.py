@@ -72,15 +72,9 @@ def task2():
 
     #print(movieFile['Genre'].unique())
     #print(movieFile['Genre'].dtype)
-    # Merge the files using 'genre' column
+    # Merging the files
     mostCommonGenre = movieFile['Genre'].value_counts().idxmax()
     leastCommonGenre = movieFile['Genre'].value_counts().idxmin()
-
-    # Print the results
-    print("Most common genre:", mostCommonGenre)
-    print("Least common genre:", leastCommonGenre)
-
-    # Print out the results
     print("Most common genre: ", mostCommonGenre)
     print("Least common genre: ", leastCommonGenre)
 
@@ -126,23 +120,31 @@ def task2():
     
 def task4():
 
-    numberOfVotes = movieFile['Number of Votes'].isnull().sum()
-    rating = movieFile['Rating'].isnull().sum()
+    # Fill null values with the average for each attribute - commom strategy to handle missing data fillna method is used to replace null values with the specified value
 
-    print(f"Number of null values in 'Number of Votes': {numberOfVotes}")
-    print(f"Number of null values in 'Rating': {rating}")
+    # movieFile['Number of Votes'].isnull(): This creates a boolean Series where each element is True if the corresponding value in the 'Number of Votes' column is null and False otherwise.
 
-    # Fill null values with the average for each attribute
+    # .sum(): This sums up the boolean values. Since True is treated as 1 and False as 0 when summed, you effectively get the count of True values, which corresponds to the number of null values in the 'Number of Votes' column.
+
+    # nullVotes = This count is then stored in the variable nullVotes. The same logic applies to counting null values in the 'Rating' column.
+
     movieFile['Number of Votes'].fillna(movieFile['Number of Votes'].mean(), inplace=True)
     movieFile['Rating'].fillna(movieFile['Rating'].mean(), inplace=True)
 
+    # isnull() method, which returns a boolean and associating with sum() the program tells us how many null exist in the file
+    nullVotes = movieFile['Number of Votes'].isnull().sum()
+    nullRating = movieFile['Rating'].isnull().sum()
+
+    print("Number of null values in Number of Votes:", nullVotes)
+    print("Number of null values in Rating:", nullRating)
+
     # Visualize the relationship between 'number of votes' and 'rating'
-    plt.figure(figsize=(10, 6))
-    plt.scatter(movieFile['Number of Votes'], movieFile['Rating'], alpha=0.5)
-    plt.title('Relationship between Number of Votes and Rating')
-    plt.xlabel('Number of Votes')
-    plt.ylabel('Rating')
-    plt.show()
+    # plt.figure(figsize=(10, 6))
+    # plt.scatter(movieFile['Number of Votes'], movieFile['Rating'], alpha=0.5)
+    # plt.title('Relationship between Number of Votes and Rating')
+    # plt.xlabel('Number of Votes')
+    # plt.ylabel('Rating')
+    # plt.show()
 
 task4()
     
