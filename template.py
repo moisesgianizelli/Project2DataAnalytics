@@ -12,6 +12,7 @@ Cohort: evSD3
 """
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 movieFile = pd.read_csv('movies.csv')
@@ -94,26 +95,66 @@ def task2():
     
     
     
-#def task3():
-    # Read the movies data
-    # movieFile = pd.read_csv('movies.csv')
+def task3():
+    """"    
+    boxplot is a statistical visualization tool that provides a concise summary of the distribution of a dataset. It is particularly useful for identifying outliers and understanding the central tendency and spread of the data
+     - Identify outliers, because boxplots are effective in visually highlighting potential outliers in a dataset
+     - A boxplot provides a clear summary of the distribution of the data
+     - If you have multiple groups or categories of movies, a boxplot can help compare the distributions of runtimes across different groups
+     https://www.geeksforgeeks.org/finding-the-outlier-points-from-matplotlib/
+    
+    obs: my first approach to solve this task  was with matpltlib, but it was too dificult to get the result. So I found more documentation using numpy:
+    https://medium.com/@dark.coding/finding-outliers-in-dataset-using-python-ffd2f585589c
+    https://www.geeksforgeeks.org/numpy-percentile-in-python/
+    """
 
-    # # Convert 'Runtime' column to numeric, handling non-numeric values
-    # movieFile['Runtime'] = pd.to_numeric(movieFile['Runtime'], errors='coerce')
+    # Display box plot to visualize outliers in Runtime
+    #plt.figure(figsize=(10, 6))
+    # extract the column 'Runtime', making a horizontal boxplot with box type
+#    movieFile['Runtime'].plot(kind='box', vert=False)
+#    plt.title('Boxplot of Movie Runtimes')
+#    plt.xlabel('Runtime (minutes)')
+#    plt.show()
+    # calculate the first quartileof the 'Runtime'
+#    q1 = movieFile['Runtime'].quantile(0.25) 
+    # calculate the third quartiles
+#    q3 = movieFile['Runtime'].quantile(0.75)
 
-    # # Display box plot to visualize outliers in Runtime
-    # plt.figure(figsize=(10, 6))
-    # plt.boxplot(movieFile['Runtime'].dropna(), vert=False)  # Drop NaN values for the boxplot
-    # plt.title('Boxplot of Movie Runtimes')
-    # plt.xlabel('Runtime (minutes)')
-    # plt.show()
+    #movieFile['Runtime'] = pd.to_numeric(movieFile['Runtime'], errors='coerce')
+    # Convert 'Runtime' column to numeric, extracting numeric values from strings
 
-    # # Identify outliers based on the box plot
-    # runtime_outliers = movieFile[movieFile['Runtime'] > movieFile['Runtime'].quantile(0.75) + 1.5 * (movieFile['Runtime'].quantile(0.75) - movieFile['Runtime'].quantile(0.25))]
+    #debugging
+    # print("Original 'Runtime' column:")
+    # print(movieFile['Runtime'])
 
-    # # Print the titles of the movies considered as outliers
-    # print("Movies with Outlier Runtimes:")
-    # print(runtime_outliers[['Title', 'Runtime']])
+    # Convert 'Runtime' column to numeric, extracting numeric values from strings
+    movieFile['Runtime'] = movieFile['Runtime'].apply(lambda x: int(''.join(filter(str.isdigit, str(x)))) if pd.notna(x) else np.nan)
+
+    # Calculate quartiles and IQR using numpy
+    q1 = np.percentile(movieFile['Runtime'].dropna(), 25)
+    q3 = np.percentile(movieFile['Runtime'].dropna(), 75)
+    iqr = q3 - q1
+
+    # Define outlier bounds
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+
+    # print("Lower Bound:", lower_bound)
+    # print("Upper Bound:", upper_bound)
+
+    # Identify outliers using numpy
+    outliers = movieFile[(movieFile['Runtime'] < lower_bound) | (movieFile['Runtime'] > upper_bound)]
+
+    # Print titles of movies considered as outliers
+    if not outliers.empty:
+        print("\nMovies with outlier runtimes:")
+        for title in outliers['Title']:
+            print(title)
+    else:
+        print("No outliers found.")
+# movieFile = movieFile.drop_duplicates(subset=['Title'])
+#investigate why it is printing duplicated data
+
 #task3()  
     
     
@@ -146,15 +187,15 @@ def task4():
     # plt.ylabel('Rating')
     # plt.show()
 
-task4()
+#task4()
     
     
     
     
-# def task5():
+def task5():
     
 #     """
-#     he main genre.csv file contains various main genres (see Column head-
+#     The main genre.csv file contains various main genres (see Column head-
 #     ers). Each main genre (column header) is associated with multiple terms.
 #     For instance, fantasy is associated with Imagination, Reverie, Dream,
 #     Delusion, and more. Please open the file to view its contents.
@@ -175,18 +216,31 @@ task4()
 #     Do not print or output anything else. Only 8 main-genres, and for each
 #     main-genre, the main genre with the highest frequency.
 #     """
+    print("oi")
+    
+#task5()    
     
     
-    
-    
-    
-# def task6():
-    
-#     """
-#     Apply one analytical task of your choice. Make sure the chosen task is
-#     useful for people in this industry and also complex enough. Use comment
-#     section and explain the idea of your task. How the results should be
-#     displayed? Please comment below this task’s function and explain the
-#     expected output. Do not generate additional output.
-#     """
+def task6():
+# Load the movies dataset
+# Extract relevant columns
+    ratings_data = movieFile[['Release Year', 'IMDb']].copy()
 
+# Convert 'Release Year' to numeric, coerce errors to NaN
+    ratings_data.loc[:, 'Release Year'] = pd.to_numeric(ratings_data['Release Year'], errors='coerce')
+
+# Drop rows with NaN values in 'Release Year' and 'IMDb'
+    ratings_data = ratings_data.dropna(subset=['Release Year', 'IMDb'])
+
+# Group by release year and calculate the average rating
+    average_ratings = ratings_data.groupby('Release Year')['IMDb'].mean().reset_index()
+
+# Plotting trends
+    plt.figure(figsize=(10, 6))
+    plt.plot(average_ratings['Release Year'], average_ratings['IMDb'], marker='o')
+    plt.title('Average IMDb Rating Trends Over Time')
+    plt.xlabel('Year')
+    plt.ylabel('Average IMDb Rating')
+    plt.grid(True)
+    plt.show()
+task6()
