@@ -30,10 +30,10 @@ def task1():
     # print(mainGenreFile.head())
     # print(movieFile.head())
     # print(mainGenreFile.head())
-    #print(movieFile.columns)
-    #print(mainGenreFile.columns)
+    # print(movieFile.columns)
+    # print(mainGenreFile.columns)
 
-   # merge the files using pd from pandas in a variable
+    # merge the files using pd from pandas in a variable
     # inner: inner merge returns only the rows that have matching values in both DataFrames. Rows with non-matching values are excluded from the result.
     mergingFiles = pd.merge(movieFile, mainGenreFile, how='inner', left_on='main_Genre', right_on='fantasy')
 
@@ -61,7 +61,7 @@ def task1():
     plt.title('Top 8 Popular Genres')
     plt.xlabel('Main Genre')
     plt.ylabel('Number of Movies')
-    #read it better
+    # read it better
     plt.xticks(rotation=45)
     plt.show()
 
@@ -79,6 +79,7 @@ def task2():
     print("Most common genre: ", mostCommonGenre)
     print("Least common genre: ", leastCommonGenre)
 
+    #same as task1
     topGenres = movieFile['Genre'].value_counts().nlargest(16)
     plt.figure(figsize=(10, 6))
     plt.bar(topGenres.index, topGenres.values, color='red')
@@ -88,8 +89,6 @@ def task2():
     plt.xticks(rotation=45)
     plt.show()
 
-
-# Call the function to execute the task
 #task2()
     
     
@@ -107,20 +106,7 @@ def task3():
     https://medium.com/@dark.coding/finding-outliers-in-dataset-using-python-ffd2f585589c
     https://www.geeksforgeeks.org/numpy-percentile-in-python/
     """
-
-    # Display box plot to visualize outliers in Runtime
-    #plt.figure(figsize=(10, 6))
-    # extract the column 'Runtime', making a horizontal boxplot with box type
-#    movieFile['Runtime'].plot(kind='box', vert=False)
-#    plt.title('Boxplot of Movie Runtimes')
-#    plt.xlabel('Runtime (minutes)')
-#    plt.show()
-    # calculate the first quartileof the 'Runtime'
-#    q1 = movieFile['Runtime'].quantile(0.25) 
-    # calculate the third quartiles
-#    q3 = movieFile['Runtime'].quantile(0.75)
-
-    #movieFile['Runtime'] = pd.to_numeric(movieFile['Runtime'], errors='coerce')
+    # movieFile['Runtime'] = pd.to_numeric(movieFile['Runtime'], errors='coerce')
     # Convert 'Runtime' column to numeric, extracting numeric values from strings
 
     #debugging
@@ -135,7 +121,7 @@ def task3():
     q3 = np.percentile(movieFile['Runtime'].dropna(), 75)
     iqr = q3 - q1
 
-    # Define outlier bounds
+    # outlier bounds
     lower_bound = q1 - 1.5 * iqr
     upper_bound = q3 + 1.5 * iqr
 
@@ -153,7 +139,7 @@ def task3():
     else:
         print("No outliers found.")
 # movieFile = movieFile.drop_duplicates(subset=['Title'])
-#investigate why it is printing duplicated data
+# investigate why it is printing duplicated data
 
 #task3()  
     
@@ -161,15 +147,9 @@ def task3():
     
 def task4():
 
-    # Fill null values with the average for each attribute - commom strategy to handle missing data fillna method is used to replace null values with the specified value
-
-    # movieFile['Number of Votes'].isnull(): This creates a boolean Series where each element is True if the corresponding value in the 'Number of Votes' column is null and False otherwise.
-
-    # .sum(): This sums up the boolean values. Since True is treated as 1 and False as 0 when summed, you effectively get the count of True values, which corresponds to the number of null values in the 'Number of Votes' column.
-
-    # nullVotes = This count is then stored in the variable nullVotes. The same logic applies to counting null values in the 'Rating' column.
-
+    #fills missing (NaN) values in the 'Number of Votes' column of the movieFile DataFrame. The fillna method is used to replace NaN values
     movieFile['Number of Votes'].fillna(movieFile['Number of Votes'].mean(), inplace=True)
+    #  same but noe in 'Rating'
     movieFile['Rating'].fillna(movieFile['Rating'].mean(), inplace=True)
 
     # isnull() method, which returns a boolean and associating with sum() the program tells us how many null exist in the file
@@ -179,68 +159,85 @@ def task4():
     print("Number of null values in Number of Votes:", nullVotes)
     print("Number of null values in Rating:", nullRating)
 
-    # Visualize the relationship between 'number of votes' and 'rating'
-    # plt.figure(figsize=(10, 6))
-    # plt.scatter(movieFile['Number of Votes'], movieFile['Rating'], alpha=0.5)
-    # plt.title('Relationship between Number of Votes and Rating')
-    # plt.xlabel('Number of Votes')
-    # plt.ylabel('Rating')
-    # plt.show()
-
+    # printing 0, is that right?
 #task4()
     
     
     
     
 def task5():
+    """""
+    Dont get this question, so I will be trying to solve what the task wants breaking down in smaller tasks.
+    """""
+    #  Your task is to read the main genre.csv file DONE
+
+    # for each main-genre, select a group of movies in the (movies.csv) file whose synopses contain one or more terms associated with the given main genre in main genre.csv.
+
+    # Please note that the words in the Synopsis need to be lower-cased and cleansed by removing the following noises: [’,’, ”’, ’.’, ’-’]. DONE
+    # The terms from the main-genres file should also be lower-cased. DONE
+    movieFile['Synopse'] = movieFile['Synopsis'].str.lower().replace('[’“”\.\-]', '', regex=True)
+    mainGenreFile.iloc[:, 1:] = mainGenreFile.iloc[:, 1:].applymap(lambda x: x.lower() if pd.notna(x) else x)
+
+    # after forming this group, further analysis is required to determine which main genre in movies.csv in that group has the highest frequency.
+    # form a group ?
+
+    group = []
+    for i in range(1, len(mainGenreFile.columns)):
+        main_genre = mainGenreFile.columns[i]
+        movies = movieFile[movieFile['Synopse'].str.contains('|'.join(mainGenreFile[main_genre].dropna()))]
+
+    # how to calculate now the most frequent genre?
+    # should I put in a new data frame?
+    # how to print?    
     
-#     """
-#     The main genre.csv file contains various main genres (see Column head-
-#     ers). Each main genre (column header) is associated with multiple terms.
-#     For instance, fantasy is associated with Imagination, Reverie, Dream,
-#     Delusion, and more. Please open the file to view its contents.
-#     Your task is to read the main genre.csv file and, for each main-genre,
-#     select a group of movies in the (movies.csv) file whose synopses contain one
-#     or more terms associated with the given main genre in main genre.csv.
-#     After forming this group, further analysis is required to determine which
-#     main genre in movies.csv in that group has the highest frequency.
-#     Please note that the words in the Synopsis need to be lower-cased and
-#     cleansed by removing the following noises: [’,’, ”’, ’.’, ’-’]. The terms from
-#     the main-genres file should also be lower-cased.
-#     How the results should be displayed? There are 8 main-genres in
-#     the main genre.csv. For each main-genre, print the main-genre (the one
-#     in main genre.csv, column header) itself, and next to it, print the most
-#     frequent main genre related to the group of movies from movies.csv. For
-#     example, the ’fantasy’ main-Genre in main genre.csv appears in many
-#     movie synopses where the main genre of those movies is also ’fantasy.’
-#     Do not print or output anything else. Only 8 main-genres, and for each
-#     main-genre, the main genre with the highest frequency.
-#     """
-    print("oi")
-    
+
+
 #task5()    
     
     
 def task6():
-# Load the movies dataset
-# Extract relevant columns
-    ratings_data = movieFile[['Release Year', 'IMDb']].copy()
 
-# Convert 'Release Year' to numeric, coerce errors to NaN
-    ratings_data.loc[:, 'Release Year'] = pd.to_numeric(ratings_data['Release Year'], errors='coerce')
 
-# Drop rows with NaN values in 'Release Year' and 'IMDb'
-    ratings_data = ratings_data.dropna(subset=['Release Year', 'IMDb'])
+    """"    
+    My first idea was: Identifying Trends in Movie Ratings, analyze the trends in movie ratings over the years but I was gettting too many problems, so I decided to go for Plooting trends.
+    I decided to create a bar plot to analyse the each genre in a specific year. This approach is good (and complex enough in my opinion) because follows the same structure that I have been doing also 
+    helps to identify patterns and trends. As I really like to see data over the years, we can basically identify trends, most popular genres and we can make future decision with that. This can be good for movie industry because
+    the industry can map audience preferences and choose to invest in similar projects.
+    https://www.analyticsvidhya.com/blog/2021/08/understanding-bar-plots-in-python-beginners-guide-to-data-visualization/
+    https://www.geeksforgeeks.org/matplotlib-pyplot-tight_layout-in-python/
+    https://builtin.com/data-science/pandas-pivot-tables
+    """
 
-# Group by release year and calculate the average rating
-    average_ratings = ratings_data.groupby('Release Year')['IMDb'].mean().reset_index()
+    #extract the columns I want to check
+    getGenre = movieFile[['Release Year', 'main_Genre']]
 
-# Plotting trends
-    plt.figure(figsize=(10, 6))
-    plt.plot(average_ratings['Release Year'], average_ratings['IMDb'], marker='o')
-    plt.title('Average IMDb Rating Trends Over Time')
+    """""
+     as this Release year column has "broken" data, I need to convert it to numerci values, and remove row with NaN values. Obs: that part took me almost one day to solve
+     https://www.easytweaks.com/convert-pandas-column-to-numeric-types/
+     https://sparkbyexamples.com/pandas/pandas-drop-rows-with-nan-values-in-dataframe/#:~:text=You%20can%20use%20the%20dropna,the%20DataFrame%20after%20removing%20rows.
+    """
+
+    getGenre.loc[:, 'Release Year'] = pd.to_numeric(getGenre['Release Year'].str.extract('(\d+)', expand=False), errors='coerce')
+    getGenre = getGenre.loc[getGenre['Release Year'].notna() & getGenre['main_Genre'].notna()]
+
+    # count the occurrences of each genre in each year. size() grouped series or dataframe with the grouping column as the index. 
+    # reset index() is used to reset the index, and name='Count' is used to assign a name to the newly created count column.
+    countsGenre = getGenre.groupby(['Release Year', 'main_Genre']).size().reset_index(name='Count')
+
+    # each genre in a column 
+    genreInColumn = countsGenre.pivot(index='Release Year', columns='main_Genre', values='Count').fillna(0)
+
+    # plotting trends
+    plt.figure(figsize=(15, 8))
+    genreInColumn.plot.bar(stacked=True, ax=plt.gca())
+    plt.title('Genre Popularity Trends Over Time')
     plt.xlabel('Year')
-    plt.ylabel('Average IMDb Rating')
+    plt.ylabel('Count')
     plt.grid(True)
+    plt.legend(title='Genre', bbox_to_anchor=(1, 1), loc='upper left')
+
+    plt.tight_layout()
     plt.show()
+
+
 task6()
